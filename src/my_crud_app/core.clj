@@ -3,18 +3,18 @@
   (:gen-class))
 
 (defn create-user [user-id name age sex]
-  (println "Criando usuaário:" user-id " Name:" name " Age:" age " Sex:" sex)
+  (println "Creating user with ID:" user-id " Name:" name " Age:" age " Sex:" sex)
   (dynamodb/put-item :table-name "Users"
                      :item {:UserId user-id
                             :Name name
-                            :Age age
+                            :Age (str age)
                             :Sex sex}))
 
 (defn get-user [user-id]
   (println "Getting user with ID:" user-id)
   (let [result (dynamodb/get-item :table-name "Users"
                                   :key {:UserId user-id})]
-    (println "Listando usuário:" result)
+    (println "Get user result:" result)
     (when (seq (:item result))
       {:user-id user-id
        :name (get-in result [:item :Name])
@@ -22,15 +22,15 @@
        :sex (get-in result [:item :Sex])})))
 
 (defn update-user [user-id new-name new-age new-sex]
-  (println "Atualizando o usuário" user-id " New Name:" new-name " New Age:" new-age " New Sex:" new-sex)
+  (println "Updating user with ID:" user-id " New Name:" new-name " New Age:" new-age " New Sex:" new-sex)
   (dynamodb/update-item :table-name "Users"
-                        :key {:UserId user-id} ;; Aqui passamos apenas a string
+                        :key {:UserId user-id}
                         :attribute-updates {:Name {:Value new-name :Action "PUT"}
                                             :Age {:Value (str new-age) :Action "PUT"}
                                             :Sex {:Value new-sex :Action "PUT"}}))
 
 (defn delete-user [user-id]
-  (println "Deletando usuário" user-id)
+  (println "Deleting user with ID:" user-id)
   (dynamodb/delete-item :table-name "Users"
                         :key {:UserId user-id}))
 
